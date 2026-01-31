@@ -36,7 +36,7 @@ val PinkThemeColors =
 
         // Modified Dark Scheme to Baby Pink & Black
         val primaryDark = Color(0xFFFFB2C5)
-        val onPrimaryDark = Color(0xFFA85295)
+        val onPrimaryDark = Color(0xFFCE7BBB)
         val primaryContainerDark = Color(0xFFF8A0BA)
         val onPrimaryContainerDark = Color(0xFFFFD9E1)
         val secondaryDark = Color(0xFFE5BDC5)
@@ -45,8 +45,8 @@ val PinkThemeColors =
         val onSecondaryContainerDark = Color(0xFFFFD9E1)
         val tertiaryDark = Color(0xFFF5B7B1)
         val onTertiaryDark = Color(0xFF4A2521)
-        val tertiaryContainerDark = Color(0xFF653B36)
-        val onTertiaryContainerDark = Color(0xFFFFDAD4)
+        val tertiaryContainerDark = Color(0xFFA27DB7)
+        val onTertiaryContainerDark = Color(0xFFA680BD)
         val errorDark = Color(0xFFFFB4AB)
         val onErrorDark = Color(0xFF690005)
         val errorContainerDark = Color(0xFF93000A)
@@ -60,7 +60,7 @@ val PinkThemeColors =
         val scrimDark = Color(0xFF000000)
         val inverseSurfaceDark = Color(0xFFFBEBED)
         val inverseOnSurfaceDark = Color(0xFF201A1B)
-        val inversePrimaryDark = Color(0xFFE375CD)
+        val inversePrimaryDark = Color(0xFFF39BDD)
 
         override val lightSchemeMaterial: androidx.compose.material3.ColorScheme =
             androidx.compose.material3.lightColorScheme(
