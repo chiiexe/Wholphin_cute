@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.damontecres.wholphin.R
 import com.github.damontecres.wholphin.data.ServerRepository
 import com.github.damontecres.wholphin.preferences.AppPreferences
+import com.github.damontecres.wholphin.preferences.RecentlyAddedType
 import com.github.damontecres.wholphin.preferences.UserPreferences
 import com.github.damontecres.wholphin.services.BackdropService
 import com.github.damontecres.wholphin.services.FavoriteWatchManager
@@ -68,14 +69,7 @@ class RecommendedTvShowViewModel
             fun create(parentId: UUID): RecommendedTvShowViewModel
         }
 
-        override val rows =
-            MutableStateFlow<List<HomeRowLoadingState>>(
-                rowTitles.keys.map {
-                    HomeRowLoadingState.Pending(
-                        context.getString(it),
-                    )
-                },
-            )
+        override val rows = MutableStateFlow<List<HomeRowLoadingState>>(emptyList())
 
         override fun init() {
             viewModelScope.launch(Dispatchers.IO + ExceptionHandler()) {
@@ -84,6 +78,26 @@ class RecommendedTvShowViewModel
                 val combineNextUp = preferences.homePagePreferences.combineContinueNext
                 val itemsPerRow = preferences.homePagePreferences.maxItemsPerRow
                 val userId = serverRepository.currentUser.value?.id
+
+                val initialRows = mutableListOf(
+                    R.string.continue_watching,
+                    R.string.next_up,
+                    R.string.recently_released
+                )
+
+                val recentlyAddedType = preferences.homePagePreferences.recentlyAddedType
+                if (recentlyAddedType == RecentlyAddedType.SPLIT) {
+                    initialRows.add(R.string.recently_added_episodes)
+                    initialRows.add(R.string.recently_added_shows)
+                } else {
+                    initialRows.add(R.string.recently_added)
+                }
+
+                initialRows.add(R.string.suggestions)
+                initialRows.add(R.string.top_unwatched)
+
+                rows.value = initialRows.map { HomeRowLoadingState.Pending(context.getString(it)) }
+
                 try {
                     val resumeItemsDeferred =
                         viewModelScope.async(Dispatchers.IO) {
@@ -124,16 +138,11 @@ class RecommendedTvShowViewModel
                     val resumeItems = resumeItemsDeferred.await()
                     val nextUpItems = nextUpItemsDeferred.await()
                     if (combineNextUp) {
-                        val combined =
-                            lastestNextUpService.buildCombined(
-                                resumeItems,
-                                nextUpItems,
-                            )
                         update(
                             R.string.continue_watching,
                             HomeRowLoadingState.Success(
                                 context.getString(R.string.continue_watching),
-                                combined,
+                                lastestNextUpService.buildCombined(resumeItems, nextUpItems),
                             ),
                         )
                         update(
@@ -183,6 +192,7 @@ class RecommendedTvShowViewModel
                             startIndex = 0,
                             limit = itemsPerRow,
                             enableTotalRecordCount = false,
+                            isMissing = false,
                         )
 
                     GetItemsRequestHandler
@@ -190,24 +200,91 @@ class RecommendedTvShowViewModel
                         .toBaseItems(api, true)
                 }
 
-                update(R.string.recently_added) {
-                    val recentlyAddedRequest =
-                        GetItemsRequest(
-                            parentId = parentId,
-                            fields = SlimItemFields,
-                            includeItemTypes = listOf(BaseItemKind.EPISODE),
-                            recursive = true,
-                            enableUserData = true,
-                            sortBy = listOf(ItemSortBy.DATE_CREATED),
-                            sortOrder = listOf(SortOrder.DESCENDING),
-                            startIndex = 0,
-                            limit = itemsPerRow,
-                            enableTotalRecordCount = false,
-                        )
+                when (recentlyAddedType) {
+                    RecentlyAddedType.SPLIT -> {
+                        update(R.string.recently_added_episodes) {
+                            val recentlyAddedEpisodesRequest =
+                                GetItemsRequest(
+                                    parentId = parentId,
+                                    fields = SlimItemFields,
+                                    includeItemTypes = listOf(BaseItemKind.EPISODE),
+                                    recursive = true,
+                                    enableUserData = true,
+                                    sortBy = listOf(ItemSortBy.DATE_CREATED),
+                                    sortOrder = listOf(SortOrder.DESCENDING),
+                                    startIndex = 0,
+                                    limit = itemsPerRow,
+                                    enableTotalRecordCount = false,
+                                    isMissing = false,
+                                )
+                            GetItemsRequestHandler
+                                .execute(api, recentlyAddedEpisodesRequest)
+                                .toBaseItems(api, true)
+                        }
+                        update(R.string.recently_added_shows) {
+                            val recentlyAddedShowsRequest =
+                                GetItemsRequest(
+                                    parentId = parentId,
+                                    fields = SlimItemFields,
+                                    includeItemTypes = listOf(BaseItemKind.SERIES),
+                                    recursive = true,
+                                    enableUserData = true,
+                                    sortBy = listOf(ItemSortBy.DATE_CREATED),
+                                    sortOrder = listOf(SortOrder.DESCENDING),
+                                    startIndex = 0,
+                                    limit = itemsPerRow,
+                                    enableTotalRecordCount = false,
+                                    isMissing = false,
+                                )
+                            GetItemsRequestHandler
+                                .execute(api, recentlyAddedShowsRequest)
+                                .toBaseItems(api, true)
+                        }
+                    }
+                    RecentlyAddedType.SHOW -> {
+                        update(R.string.recently_added) {
+                            val recentlyAddedRequest =
+                                GetItemsRequest(
+                                    parentId = parentId,
+                                    fields = SlimItemFields,
+                                    includeItemTypes = listOf(BaseItemKind.SERIES),
+                                    recursive = true,
+                                    enableUserData = true,
+                                    sortBy = listOf(ItemSortBy.DATE_CREATED),
+                                    sortOrder = listOf(SortOrder.DESCENDING),
+                                    startIndex = 0,
+                                    limit = itemsPerRow,
+                                    enableTotalRecordCount = false,
+                                    isMissing = false,
+                                )
 
-                    GetItemsRequestHandler
-                        .execute(api, recentlyAddedRequest)
-                        .toBaseItems(api, true)
+                            GetItemsRequestHandler
+                                .execute(api, recentlyAddedRequest)
+                                .toBaseItems(api, true)
+                        }
+                    }
+                    else -> {
+                        update(R.string.recently_added) {
+                            val recentlyAddedRequest =
+                                GetItemsRequest(
+                                    parentId = parentId,
+                                    fields = SlimItemFields,
+                                    includeItemTypes = listOf(BaseItemKind.EPISODE),
+                                    recursive = true,
+                                    enableUserData = true,
+                                    sortBy = listOf(ItemSortBy.DATE_CREATED),
+                                    sortOrder = listOf(SortOrder.DESCENDING),
+                                    startIndex = 0,
+                                    limit = itemsPerRow,
+                                    enableTotalRecordCount = false,
+                                    isMissing = false,
+                                )
+
+                            GetItemsRequestHandler
+                                .execute(api, recentlyAddedRequest)
+                                .toBaseItems(api, true)
+                        }
+                    }
                 }
 
                 update(R.string.suggestions) {
@@ -256,20 +333,29 @@ class RecommendedTvShowViewModel
             row: HomeRowLoadingState,
         ) {
             rows.update { current ->
-                current.toMutableList().apply { set(rowTitles[title]!!, row) }
+                val updatedList = current.toMutableList()
+                val indexToUpdate = updatedList.indexOfFirst { it.title == context.getString(title) }
+                if (indexToUpdate != -1) {
+                    updatedList[indexToUpdate] = row
+                }
+                updatedList
             }
         }
 
         companion object {
-            private val rowTitles =
-                listOf(
-                    R.string.continue_watching,
-                    R.string.next_up,
-                    R.string.recently_released,
-                    R.string.recently_added,
-                    R.string.suggestions,
-                    R.string.top_unwatched,
-                ).mapIndexed { index, i -> i to index }.toMap()
+            // This map will now hold a fixed order of *all possible* rows.
+            // The actual rows displayed will be determined dynamically in init() based on preferences.
+            private val allPossibleRowTitles = listOf(
+                R.string.continue_watching,
+                R.string.next_up,
+                R.string.recently_released,
+                R.string.recently_added, // Placeholder for the combined row
+                R.string.recently_added_episodes, // Placeholder for split episodes
+                R.string.recently_added_shows, // Placeholder for split shows
+                R.string.suggestions,
+                R.string.top_unwatched
+            )
+            val rowTitles = allPossibleRowTitles.mapIndexed { index, titleRes -> titleRes to index }.toMap()
         }
     }
 

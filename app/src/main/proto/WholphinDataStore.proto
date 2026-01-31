@@ -78,10 +78,17 @@ message PlaybackPreferences {
   bool resolution_switching = 23;
 }
 
+enum RecentlyAddedType {
+  EPISODE = 0;
+  SHOW = 1;
+  SPLIT = 2;
+}
+
 message HomePagePreferences{
   int32 max_items_per_row = 1;
   bool enable_rewatching_next_up = 2;
   bool combine_continue_next = 3;
+  RecentlyAddedType recently_added_type = 4;
 }
 
 enum ThemeSongVolume {
@@ -100,6 +107,7 @@ enum AppThemeColors {
   ORANGE = 3;
   BOLD_BLUE = 4;
   OLED_BLACK = 5;
+  PINK = 6;
 }
 
 enum EdgeStyle{

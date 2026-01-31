@@ -463,6 +463,10 @@
     <string name="software_decoding_av1">AV1 software decoding</string>
     <string name="upgrade_mpv_toast">MPV is now the default player except for HDR.\nYou can change this in settings.</string>
 
+    <string name="recently_added_type">Show recently added</string>
+    <string name="recently_added_episodes">Recently added episodes</string>
+    <string name="recently_added_shows">Recently added TV shows</string>
+
     <string-array name="theme_song_volume">
         <item>Disabled</item>
         <item>Lowest</item>
@@ -479,6 +483,7 @@
         <item>Orange</item>
         <item>Bold Blue</item>
         <item>Black</item>
+        <item>Pink</item>
     </string-array>
 
     <string-array name="skip_behaviors">
@@ -561,6 +566,12 @@
         <item>Image with dynamic color</item>
         <item>Image only</item>
         <item>None</item>
+    </string-array>
+
+    <string-array name="recently_added_type_options">
+        <item>Episodes</item>
+        <item>TV Shows</item>
+        <item>Split</item>
     </string-array>
 
 </resources>

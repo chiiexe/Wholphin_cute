@@ -210,6 +210,19 @@ sealed interface AppPreference<Pref, T> {
                 summaryOff = R.string.disabled,
             )
 
+        val RecentlyAddedTypePref =
+            AppChoicePreference<AppPreferences, RecentlyAddedType>(
+                title = R.string.recently_added_type,
+                defaultValue = RecentlyAddedType.EPISODE,
+                getter = { it.homePagePreferences.recentlyAddedType },
+                setter = { prefs, value ->
+                    prefs.updateHomePagePreferences { recentlyAddedType = value }
+                },
+                displayValues = R.array.recently_added_type_options,
+                indexToValue = { RecentlyAddedType.forNumber(it) },
+                valueToIndex = { if (it != RecentlyAddedType.UNRECOGNIZED) it.number else 0 },
+            )
+
         val PlayThemeMusic =
             AppChoicePreference<AppPreferences, ThemeSongVolume>(
                 title = R.string.play_theme_music,
@@ -916,6 +929,7 @@ val basicPreferences =
                     AppPreference.HomePageItems,
                     AppPreference.CombineContinueNext,
                     AppPreference.RewatchNextUp,
+                    AppPreference.RecentlyAddedTypePref,
                     AppPreference.PlayThemeMusic,
                     AppPreference.RememberSelectedTab,
                     AppPreference.SubtitleStyle,
