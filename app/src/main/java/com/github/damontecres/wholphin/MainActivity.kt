@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -41,6 +42,8 @@ import com.github.damontecres.wholphin.data.ServerRepository
 import com.github.damontecres.wholphin.preferences.AppPreference
 import com.github.damontecres.wholphin.preferences.AppPreferences
 import com.github.damontecres.wholphin.preferences.UserPreferences
+import com.github.damontecres.wholphin.screensaver.InAppScreensaver
+import com.github.damontecres.wholphin.screensaver.InteractionTrackerViewModel
 import com.github.damontecres.wholphin.services.AppUpgradeHandler
 import com.github.damontecres.wholphin.services.BackdropService
 import com.github.damontecres.wholphin.services.DatePlayedInvalidationService
@@ -85,6 +88,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
+    private val interactionTrackerViewModel: InteractionTrackerViewModel by viewModels()
+
 
     @Inject
     lateinit var userPreferencesDataStore: DataStore<AppPreferences>
@@ -312,10 +317,19 @@ class MainActivity : AppCompatActivity() {
                                 },
                             )
                         }
+                        InAppScreensaver(
+                            viewModel = interactionTrackerViewModel,
+                            dreamHostViewModel = hiltViewModel()
+                        )
                     }
                 }
             }
         }
+    }
+
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        interactionTrackerViewModel.notifyInteraction()
     }
 
     override fun onResume() {

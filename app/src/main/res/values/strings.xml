@@ -265,6 +265,11 @@
         <item quantity="one">%d item</item>
         <item quantity="other">%d items</item>
     </plurals>
+    <plurals name="minutes">
+        <item quantity="zero">%d minutes</item>
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
     <plurals name="seconds">
         <item quantity="zero">%d seconds</item>
         <item quantity="one">%d second</item>
@@ -328,6 +333,7 @@
     <string name="skip_back_preference">Skip back</string>
     <string name="skip_commercials_behavior">Skip commercials behavior</string>
     <string name="skip_forward_preference">Skip forward</string>
+    <string name="screensaver_delay">Screensaver delay</string>
     <string name="skip_intro_behavior">Skip intro behavior</string>
     <string name="skip_outro_behavior">Skip outro behavior</string>
     <string name="skip_previews_behavior">Skip previews behavior</string>

@@ -154,6 +154,7 @@ message InterfacePreferences {
   LiveTvPreferences live_tv_preferences = 8;
   BackdropStyle backdrop_style = 9;
   SubtitlePreferences hdr_subtitles_preferences = 10;
+  int64 screensaver_delay_ms = 11;
 }
 
 message AdvancedPreferences {

@@ -36,7 +36,7 @@ fun DreamHost(imageUrl: String?) {
     LaunchedEffect(Unit) {
         bgAlpha.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 1000) // 1 sec
+            animationSpec = tween(durationMillis = 1500) // 1 sec
         )
     }
 
@@ -74,9 +74,9 @@ fun DreamHost(imageUrl: String?) {
                 LaunchedEffect(bitmap) {
                     scale.snapTo(1f) // lowered zoom even more
                     scale.animateTo(
-                        targetValue = 1.05f,
+                        targetValue = 1.1f,
                         animationSpec = tween(
-                            durationMillis = 30000,
+                            durationMillis = 60000, //1 minutos
                             easing = LinearEasing
                         )
                     )

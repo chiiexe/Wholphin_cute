@@ -904,6 +904,32 @@ sealed interface AppPreference<Pref, T> {
                 setter = { prefs, _ -> prefs },
             )
 
+        val ScreensaverDelay =
+            AppSliderPreference<AppPreferences>(
+                title = R.string.screensaver_delay,
+                defaultValue = 0,
+                min = 0,
+                max = 1.hours.inWholeMilliseconds,
+                interval = 1.minutes.inWholeMilliseconds.toInt(),
+                getter = { it.interfacePreferences.screensaverDelayMs },
+                setter = { prefs, value ->
+                    prefs.updateInterfacePreferences { screensaverDelayMs = value }
+                },
+                summarizer = { value ->
+                    if (value == 0L) {
+                        WholphinApplication.instance.getString(R.string.disabled)
+                    } else if (value != null) {
+                        WholphinApplication.instance.resources.getQuantityString(
+                            R.plurals.minutes,
+                            value.milliseconds.inWholeMinutes.toInt(),
+                            value.milliseconds.inWholeMinutes.toInt(),
+                        )
+                    } else {
+                        null
+                    }
+                },
+            )
+
         val SlideshowDuration =
             AppSliderPreference<AppPreferences>(
                 title = R.string.slideshow_duration,
@@ -960,6 +986,7 @@ val basicPreferences =
                     AppPreference.RememberSelectedTab,
                     AppPreference.SubtitleStyle,
                     AppPreference.ThemeColors,
+                    AppPreference.ScreensaverDelay,
                 ),
         ),
         PreferenceGroup(
